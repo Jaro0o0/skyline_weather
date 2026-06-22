@@ -4,6 +4,10 @@ import { get } from "http";
 import Image from "next/image";
 import { useState, useEffect, ChangeEvent } from "react";
 
+
+import Dashboard from "@/components/Dashboard/Dashboard";
+import Cto from "@/components/Cto/Cto";
+
 interface GeoData {
   lat: number;
   lon: number;
@@ -73,6 +77,13 @@ export default function Page() {
             location: data.name,
             description: data.weather[0].description,
             icon: data.weather[0].icon,
+            wind: data.wind,
+            humidity: data.main.humidity,
+            pressure: data.main.pressure,
+
+
+            
+           
           });
         } else {
           console.error('Unexpected weather data shape:', data);
@@ -125,8 +136,8 @@ export default function Page() {
   }
 
   return (
-    <main className="w-full h-screen relative overflow-hidden">
-      <video src='/videos/cloud.mp4' className="absolute inset-0 object-cover" autoPlay loop muted/>
+    <main className="w-full h-screen relative overflow-hidden bg-neutral-600">
+      {/* <video src='/videos/cloud.mp4' className="absolute inset-0 object-cover" autoPlay loop muted/> */}
 
       <div className="grid grid-cols-[1fr_3fr] h-full absolute inset-0">
 
@@ -148,53 +159,15 @@ export default function Page() {
 
             <p>{weatherData?.icon}</p>
           </div>
-         
-        </div>
-
-
-
-
-        {/* Dashboard_COL */}
-        <div className="w-full flex flex-col justify-between overflow-y-auto max-h-screen p-4 h-screen">
-          {view === "Week" && (
-            <div className=" flex flex-col justify-between  h-full">
-
-
-              <div className="flex space-x-4">
-                <button onClick={() => setView('Week')}>Week</button>
-                <button onClick={() => setView('Today')}>Today</button>
-              </div>
-
-
-
-              
-              {/* Text_BOX */}
-              <div className=" flex-1 flex flex-col gap-4  justify-center space-y-2 mb-4">
-
-
-
-                <h1 className="text-4xl font-bold">{weatherData?.description}</h1>
-              </div>
-
-              <div className=" flex-1 flex flex-col gap-4  justify-center space-y-2 mb-4">
-                <h1 className="text-4xl font-bold">{weatherData?.temp}°C</h1>
-                <h1 className="text-2xl font-bold">{weatherData?.description}</h1>
-                <div className="flex items-center gap-2">
-                      <h1 className="text-2xl font-bold">{weatherData?.location}</h1>
-                      <p>{weatherData?.icon}</p>
-                      
-                </div>
-          
-              </div>
 
 
               {/* WEEK PROGNOSE */}
               
                   {/* Add weekly forecast UI here */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4  flex-1">
+                  <div className="">
                     {weekWeatherData?.map((item,index)=>{
                       return(
-                        <div key={index} className="bg-white/30 backdrop-blur-3xl rounded-lg p-4 shadow hover:bg-white/40 transition-colors flex flex-col items-center">
+                        <div key={index} className=" rounded-lg p-4 shadow hover:bg-white/40 transition-colors flex flex-col items-center">
 
                             
 
@@ -235,12 +208,22 @@ export default function Page() {
                       )
                     })}
                 </div>
-                
-              
-            </div>
-          )}
+         
         </div>
-      </div>
+
+
+
+
+        {/* Dashboard_COL */}
+        <div className="flex flex-col">
+            
+             <Dashboard weatherData={weatherData} weekWeatherData={weekWeatherData}/>
+         </div>
+        
+     
+        
+        </div>
+      
     </main>
   );
 }
