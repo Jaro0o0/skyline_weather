@@ -37,10 +37,19 @@ export default function Page() {
     if (!city) return;
 
     const getGeoData = async () => {
-      const res = await fetch(`/api/latitude/${city}`);
-      const data = await res.json();
-        console.log(data);
-      setGeoData(data);
+      try {
+        const res = await fetch(`/api/latitude/${city}`);
+        if (!res.ok) {
+          const errData = await res.json();
+          console.error('Geolocation API error:', errData);
+          return;
+        }
+        const data = await res.json();
+        console.log('Geo data:', data);
+        setGeoData(data);
+      } catch (err) {
+        console.error('Failed to fetch geolocation:', err);
+      }
     };
     getGeoData();
   };
@@ -53,18 +62,26 @@ export default function Page() {
     if (!geoData) return;
     const getCurrentWeather = async () => {
       const { lat, lon } = geoData;
-      const res = await fetch(`/api/current/weather?lat=${lat}&lon=${lon}`);
-      const data = await res.json();
-      console.log(data);
-
-
-      setWeatherData({
-        temp: data.main.temp,
-        location: data.name,
-        description: data.weather[0].description,
-        icon:  data.weather[0].icon,
-
-      });
+      try {
+        const res = await fetch(`/api/current/weather?lat=${lat}&lon=${lon}`);
+        const data = await res.json();
+        console.log(data);
+        // Validate response shape before updating state
+        if (data && data.main && data.weather && data.weather[0]) {
+          setWeatherData({
+            temp: data.main.temp,
+            location: data.name,
+            description: data.weather[0].description,
+            icon: data.weather[0].icon,
+          });
+        } else {
+          console.error('Unexpected weather data shape:', data);
+          setWeatherData(null);
+        }
+      } catch (err) {
+        console.error('Failed to fetch current weather:', err);
+        setWeatherData(null);
+      }
     };
     getCurrentWeather();
   }, [geoData]);
@@ -125,8 +142,12 @@ export default function Page() {
             
       </div>
 
-          <p>{weatherData?.temp}</p>
-          <p>{weatherData?.icon}</p>
+        {/* DATA */}
+        <div className="flex gap-4">
+            <p>{Math.round(weatherData?.temp || 0)}°C</p>
+
+            <p>{weatherData?.icon}</p>
+          </div>
          
         </div>
         {/* Dashboard_COL */}
