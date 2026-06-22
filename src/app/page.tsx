@@ -23,7 +23,7 @@ export default function Page() {
 
   const [weatherData, setWeatherData] = useState<any>(null);
 
-  const [weekWeatherData,setWeekWeatherData] = useState([]);
+  const [weekWeatherData,setWeekWeatherData] = useState<any[]>([]);
 
   const [view, setView] = useState<'Week' | 'Today'>('Week');
 
@@ -144,12 +144,16 @@ export default function Page() {
 
         {/* DATA */}
         <div className="flex gap-4">
-            <p>{Math.round(weatherData?.temp || 0)}°C</p>
+            <p className="text-4xl font-bold">{Math.round(weatherData?.temp || 0)}°C</p>
 
             <p>{weatherData?.icon}</p>
           </div>
          
         </div>
+
+
+
+
         {/* Dashboard_COL */}
         <div className="w-full flex flex-col justify-between overflow-y-auto max-h-screen p-4 h-screen">
           {view === "Week" && (
@@ -174,8 +178,13 @@ export default function Page() {
 
               <div className=" flex-1 flex flex-col gap-4  justify-center space-y-2 mb-4">
                 <h1 className="text-4xl font-bold">{weatherData?.temp}°C</h1>
-                <h1 className="text-2xl font-bold">{weatherData?.location}</h1>
                 <h1 className="text-2xl font-bold">{weatherData?.description}</h1>
+                <div className="flex items-center gap-2">
+                      <h1 className="text-2xl font-bold">{weatherData?.location}</h1>
+                      <p>{weatherData?.icon}</p>
+                      
+                </div>
+          
               </div>
 
 
@@ -185,11 +194,38 @@ export default function Page() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4  flex-1">
                     {weekWeatherData?.map((item,index)=>{
                       return(
-                        <div key={index} className="bg-white/30 backdrop-blur-3xl p-4">
+                        <div key={index} className="bg-white/30 backdrop-blur-3xl rounded-lg p-4 shadow hover:bg-white/40 transition-colors flex flex-col items-center">
 
                             
 
-                             <p>{item.dt_txt}</p> 
+                             {/* Date (only the day part) */}
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{item.dt_txt.split(' ')[0]}</p>
+
+                          {/* Weather icon */}
+                          {item.weather?.[0]?.icon && (
+                            <img
+                              src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
+                              alt={item.weather[0].description}
+                              className="w-12 h-12 mt-2"
+                            />
+                          )}
+
+                          {/* Temperature – show high & low if present */}
+                          {item.main?.temp && (
+                            <p className="mt-2 text-lg font-bold text-gray-900 dark:text-gray-100">{Math.round(item.main.temp)}°C</p>
+                          )}
+                          {item.main?.temp_min && item.main?.temp_max && (
+                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                              {Math.round(item.main.temp_min)}° / {Math.round(item.main.temp_max)}°
+                            </p>
+                          )}
+
+                          {/* Short description */}
+                          {item.weather?.[0]?.description && (
+                            <p className="mt-1 text-xs capitalize text-gray-600 dark:text-gray-400">
+                              {item.weather[0].description}
+                            </p>
+                          )} 
 
 
 
