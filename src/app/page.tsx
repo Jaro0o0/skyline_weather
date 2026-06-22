@@ -1,65 +1,189 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { get } from "http";
+import Image from "next/image";
+import { useState, useEffect, ChangeEvent } from "react";
+
+interface GeoData {
+  lat: number;
+  lon: number;
+}
+
+
+
+//ICONS
+
+const icons = []
+
+
+
+
+export default function Page() {
+  const [geoData, setGeoData] = useState<GeoData>({ lat: 52.2297, lon: 21.0122 });
+
+  const [weatherData, setWeatherData] = useState<any>(null);
+
+  const [weekWeatherData,setWeekWeatherData] = useState([]);
+
+  const [view, setView] = useState<'Week' | 'Today'>('Week');
+
+
+
+
+  const [cityInput, setCityInput] = useState('');
+
+  const handleChange = () => {
+    const city = cityInput.trim();
+    if (!city) return;
+
+    const getGeoData = async () => {
+      const res = await fetch(`/api/latitude/${city}`);
+      const data = await res.json();
+        console.log(data);
+      setGeoData(data);
+    };
+    getGeoData();
+  };
+
+
+
+
+  // WEATHER_DATA
+  useEffect(() => {
+    if (!geoData) return;
+    const getCurrentWeather = async () => {
+      const { lat, lon } = geoData;
+      const res = await fetch(`/api/current/weather?lat=${lat}&lon=${lon}`);
+      const data = await res.json();
+      console.log(data);
+
+
+      setWeatherData({
+        temp: data.main.temp,
+        location: data.name,
+        description: data.weather[0].description,
+        icon:  data.weather[0].icon,
+
+      });
+    };
+    getCurrentWeather();
+  }, [geoData]);
+
+
+
+  // WEEK
+  useEffect(()=> {
+    const getWeekWeather = async ()=>{
+      const { lat, lon } = geoData;
+      const res = await fetch(`/api/week?lat=${lat}&lon=${lon}`)
+      const data = await res.json();
+
+      const filteredList = data.list.filter(( item ) => item.dt_txt.includes("12:00:00"));
+      setWeekWeatherData(filteredList);
+
+      
+
+     
+
+
+
+      console.log(data)
+    }
+    getWeekWeather();
+
+  },[])
+
+
+
+
+  // half
+  function halfString(str: string): string {
+    
+    const halfString = Math.floor(str.length / 2);
+
+    const firstHalf = str.substring(0, halfString);
+    const secondHalf = str.slice(halfString);
+
+    return firstHalf + '\n' + secondHalf;
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="w-full h-screen relative overflow-hidden">
+      <video src='/videos/cloud.mp4' className="absolute inset-0 object-cover" autoPlay loop muted/>
+
+      <div className="grid grid-cols-[1fr_3fr] h-full absolute inset-0">
+
+
+        {/* SEARCH_COL */}
+        <div className="p-4 bg-white/30 backdrop-blur-2xl  backdrop-blur-sm   h-full" >
+
+      {/* INPUT_BOX */}
+      <div className="flex">
+          <input     onChange={(e) => setCityInput(e.target.value)}  onKeyDown={(e) => e.key === "Enter" && handleChange()} placeholder="searh " className="w-full"/>
+  
+                       
+            
+      </div>
+
+          <p>{weatherData?.temp}</p>
+          <p>{weatherData?.icon}</p>
+         
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        {/* Dashboard_COL */}
+        <div className="w-full flex flex-col justify-between overflow-y-auto max-h-screen p-4 h-screen">
+          {view === "Week" && (
+            <div className=" flex flex-col justify-between  h-full">
+
+
+              <div className="flex space-x-4">
+                <button onClick={() => setView('Week')}>Week</button>
+                <button onClick={() => setView('Today')}>Today</button>
+              </div>
+
+
+
+              
+              {/* Text_BOX */}
+              <div className=" flex-1 flex flex-col gap-4  justify-center space-y-2 mb-4">
+
+
+
+                <h1 className="text-4xl font-bold">{weatherData?.description}</h1>
+              </div>
+
+              <div className=" flex-1 flex flex-col gap-4  justify-center space-y-2 mb-4">
+                <h1 className="text-4xl font-bold">{weatherData?.temp}°C</h1>
+                <h1 className="text-2xl font-bold">{weatherData?.location}</h1>
+                <h1 className="text-2xl font-bold">{weatherData?.description}</h1>
+              </div>
+
+
+              {/* WEEK PROGNOSE */}
+              
+                  {/* Add weekly forecast UI here */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4  flex-1">
+                    {weekWeatherData?.map((item,index)=>{
+                      return(
+                        <div key={index} className="bg-white/30 backdrop-blur-3xl p-4">
+
+                            
+
+                             <p>{item.dt_txt}</p> 
+
+
+
+
+                        </div>
+
+                      )
+                    })}
+                </div>
+                
+              
+            </div>
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
