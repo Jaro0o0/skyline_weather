@@ -1,9 +1,4 @@
-import React from "react";
-
-interface WeatherIconProps {
-  iconCode?: string;
-  className?: string;
-}
+import { WeatherIconProps } from "@/types";
 
 export default function WeatherIcon({ iconCode = "01d", className = "w-16 h-16" }: WeatherIconProps) {
   const code = iconCode.replace(/[dn]/, ""); // Strip day/night indicator for general type
