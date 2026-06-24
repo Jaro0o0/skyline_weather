@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Use the legacy One Call 2.5 endpoint, which is accessible on the free tier.
- const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.API_KEY}&units=metric&lang=pl`;
+ const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.API_KEY}&units=metric&lang=en`;
   const res = await fetch(url);
   if (!res.ok) {
     const err = await res.json();
