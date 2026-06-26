@@ -7,6 +7,7 @@ Weather forecast web application built with Next.js and Tailwind CSS. Users can 
 - `TypeScript`
 - `Tailwind CSS `
 - `Server-side API routes`
+- `App Router`
 
 
 ## 🚀 Features
