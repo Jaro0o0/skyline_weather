@@ -1,4 +1,4 @@
-## ⛅ Weather App
+## ⛅ Skyline Weather
 Weather forecast web application built with Next.js and Tailwind CSS. Users can search for the current weather and forecast by city name. API requests are handled through Next.js server-side routes to securely protect the API key.
 
 ## ✨ Technologies
