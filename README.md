@@ -6,18 +6,17 @@ Weather forecast web application built with Next.js and Tailwind CSS. Users can 
 - `Next.js`
 - `TypeScript`
 - `Tailwind CSS `
-- `Server-side API routes`
-- `App Router`
+
 
 
 ## 🚀 Features
 
-- `Fully responsive design that adapts to different screen sizes`
-- `Current weather data`
+- `Current weather data provided by the OpenWeather API`
+- `Server-side API integration using the App Router mechanism`
+- `Fully responsive design`
 - `Search weather by city name`
 
 
-## 🎬 Preview
-#
+
 
 
